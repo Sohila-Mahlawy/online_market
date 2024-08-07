@@ -1,0 +1,148 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}New Products Requests{% endblock %}
+
+{% block head %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+    .seller-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .seller-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .seller-card h3 {
+        margin-top: 0;
+    }
+    .seller-card .info {
+        margin-bottom: 10px;
+    }
+    .seller-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .seller-card button:hover {
+        background-color: #555;
+    }
+    .btn-success, .btn-danger {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-success:hover {
+        background-color: #28a745;
+    }
+    .btn-danger:hover {
+        background-color: #dc3545;
+    }
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 5px 10px;
+    }
+    .text-center {
+        text-align: center;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f4f4f4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Product Requests</h2>
+    <div class="seller-container">
+        {% for product in products %}
+        <div class="seller-card" id="product-{{ product.id }}">
+            <h3>{{ product.name }}</h3>
+            <div class="info">Price: ${{ product.price }}</div>
+            <div class="info">Category: {{ product.category }}</div>
+            <div class="info">Stock: {{ product.stock }}</div>
+            <div>
+                <button class="btn btn-success btn-sm approve-btn" data-id="{{ product.id }}">Approve</button>
+                <button class="btn btn-danger btn-sm reject-btn" data-id="{{ product.id }}">Reject</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center">No product requests found</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    var csrfToken = "{{ csrf_token() }}";
+
+    $(".approve-btn").click(function() {
+        var productId = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: "/approve_product/" + productId,
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#product-" + productId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(response) {
+                alert("An error occurred while approving the product.");
+            }
+        });
+    });
+
+    $(".reject-btn").click(function() {
+        var productId = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: "/reject_product/" + productId,
+            headers: {
+                "X-CSRFToken": csrfToken
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#product-" + productId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(response) {
+                alert("An error occurred while rejecting the product.");
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
