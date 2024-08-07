@@ -22,29 +22,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
 
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    seller_id = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
-    orders = db.relationship('Order', backref='product', lazy=True)
 
-    @staticmethod
-    def add(name, price, stock, user_id, seller_id):
-        new_product = Product(name=name, price=price, stock=stock, user_id=user_id, seller_id=seller_id)
-        db.session.add(new_product)
-        db.session.commit()
-
-    def buy(self, user_id):
-        if self.stock > 0:
-            self.stock -= 1
-            order = Order(user_id=user_id, product_id=self.id, seller_id=self.seller_id)
-            db.session.add(order)
-            db.session.commit()
-            return True, "Purchase successful!"
-        return False, "Product out of stock."
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,3 +42,33 @@ class Seller(db.Model):
     date_registered = db.Column(db.DateTime, default=datetime.utcnow)
     products = db.relationship('Product', backref='owner_seller', lazy=True)
     orders = db.relationship('Order', backref='seller', lazy=True)
+
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    stock = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    image1 = db.Column(db.String(120), nullable=True)
+    image2 = db.Column(db.String(120), nullable=True)
+    image3 = db.Column(db.String(120), nullable=True)
+    image4 = db.Column(db.String(120), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
+    orders = db.relationship('Order', backref='product', lazy=True)
+
+    @staticmethod
+    def add(name, price, stock, category, user_id, seller_id, image1=None, image2=None, image3=None, image4=None):
+        new_product = Product(name=name, price=price, stock=stock, category=category, user_id=user_id, seller_id=seller_id, image1=image1, image2=image2, image3=image3, image4=image4)
+        db.session.add(new_product)
+        db.session.commit()
+
+    def buy(self, user_id):
+        if self.stock > 0:
+            self.stock -= 1
+            order = Order(user_id=user_id, product_id=self.id, seller_id=self.seller_id)
+            db.session.add(order)
+            db.session.commit()
+            return True, "Purchase successful!"
+        return False, "Product out of stock."

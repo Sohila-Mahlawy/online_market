@@ -111,6 +111,63 @@
             padding: 1em 0;
             margin-top: 2em;
         }
+
+        /* Custom form styling for product addition */
+        .container.mt-5 {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container.mt-5 h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #343a40;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .form-control,
+        .form-control-file {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            box-sizing: border-box;
+        }
+
+        .form-control-file {
+            padding: 3px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
     </style>
 </head>
 <body>
@@ -129,9 +186,9 @@
                             <button type="submit"><i class="fas fa-search"></i></button>
                         </form>
                     </li>
-                    <li><a href="/add-product">Add Product</a></li>
-                    <li><a href="/remove-product">Remove Product</a></li>
-                    <li><a href="/send-category-request">Category Request</a></li>
+                    <li><a href="/add_product">Add Product</a></li>
+                    <li><a href="/remove_product">Remove Product</a></li>
+                    <li><a href="/category_request">Category Request</a></li>
                     <li><a href="/logout">Logout</a></li>
                 </ul>
             </div>

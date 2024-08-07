@@ -1,5 +1,6 @@
 import json
 import os
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta, date
 from flask_bcrypt import Bcrypt
 from flask_admin import Admin
@@ -210,6 +211,61 @@ def reject_seller(seller_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+
+@app.route("/add_product", methods=["GET", "POST"])
+@login_required
+def add_product():
+    if current_user.role != 'seller':
+        abort(403)
+
+    form = ProductForm()
+    if form.validate_on_submit():
+        product_name = form.name.data
+        price = form.price.data
+        category = form.category.data
+        stock = form.stock.data
+        user_id = current_user.id
+        seller_id = Seller.query.filter_by(email=current_user.email).first().id
+
+        image1 = form.image1.data
+        image2 = form.image2.data
+        image3 = form.image3.data
+        image4 = form.image4.data
+
+        image1_filename = secure_filename(image1.filename) if image1 else None
+        image2_filename = secure_filename(image2.filename) if image2 else None
+        image3_filename = secure_filename(image3.filename) if image3 else None
+        image4_filename = secure_filename(image4.filename) if image4 else None
+
+        if image1:
+            image1.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image1_filename))
+        if image2:
+            image2.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image2_filename))
+        if image3:
+            image3.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image3_filename))
+        if image4:
+            image4.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image4_filename))
+
+        product = Product(
+            name=product_name,
+            price=price,
+            category=category,
+            stock=stock,
+            user_id=user_id,
+            seller_id=seller_id,
+            image1=image1_filename,
+            image2=image2_filename,
+            image3=image3_filename,
+            image4=image4_filename
+        )
+        db.session.add(product)
+        db.session.commit()
+
+        flash('Product has been added!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template("add_product.html", form=form)
 
 
 if __name__ == "__main__":
