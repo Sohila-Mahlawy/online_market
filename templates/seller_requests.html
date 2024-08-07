@@ -38,7 +38,6 @@
         background-color: #555;
     }
 </style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -57,18 +56,18 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 $(document).ready(function() {
-    var csrftoken = "{{ csrf_token() }}";
-
     $(".approve-btn").click(function() {
         var sellerId = $(this).data("id");
         $.ajax({
             type: "POST",
             url: "/approve_seller/" + sellerId,
             headers: {
-                "X-CSRFToken": csrftoken
+                "X-CSRFToken": csrf_token
             },
             success: function(response) {
                 if (response.status === "success") {
@@ -85,24 +84,23 @@ $(document).ready(function() {
 
     $(".reject-btn").click(function() {
         var sellerId = $(this).data("id");
-        // Add your reject functionality here if needed
-        // $.ajax({
-        //     type: "POST",
-        //     url: "/reject_seller/" + sellerId,
-        //     headers: {
-        //         "X-CSRFToken": csrftoken
-        //     },
-        //     success: function(response) {
-        //         if (response.status === "success") {
-        //             $("#seller-" + sellerId).remove();
-        //         } else {
-        //             alert(response.message);
-        //         }
-        //     },
-        //     error: function(response) {
-        //         alert("An error occurred while rejecting the seller.");
-        //     }
-        // });
+        $.ajax({
+            type: "POST",
+            url: "/reject_seller/" + sellerId,
+            headers: {
+                "X-CSRFToken": csrf_token
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#seller-" + sellerId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(response) {
+                alert("An error occurred while rejecting the seller.");
+            }
+        });
     });
 });
 </script>
