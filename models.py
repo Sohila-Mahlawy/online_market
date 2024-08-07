@@ -57,6 +57,7 @@ class Product(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
     orders = db.relationship('Order', backref='product', lazy=True)
+    authenticated = db.Column(db.Boolean, default=False)
 
     @staticmethod
     def add(name, price, stock, category, user_id, seller_id, image1=None, image2=None, image3=None, image4=None):

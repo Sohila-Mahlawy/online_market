@@ -268,5 +268,55 @@ def add_product():
     return render_template("add_product.html", form=form)
 
 
+@app.route('/my_products')
+@login_required
+def my_products():
+    # Query products belonging to the current user
+    products = Product.query.filter_by(seller_id=current_user.id).all()
+
+    return render_template('my_products.html', products=products)
+
+
+
+@app.route('/product_requests')
+@login_required
+def product_requests():
+    if current_user.role != 'admin':
+        abort(403)
+    # Query products that need admin approval
+    products = Product.query.filter_by(authenticated=False).all()
+    return render_template("product_requests.html", products=products)
+
+@app.route('/approve_product/<int:product_id>', methods=['POST'])
+@login_required
+def approve_product(product_id):
+    if current_user.role != 'admin':
+        abort(403)
+    product = Product.query.get_or_404(product_id)
+    if product.authenticated:
+        return jsonify({'status': 'error', 'message': 'Product already approved'})
+    product.authenticated = True
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Product approved'})
+
+@app.route('/reject_product/<int:product_id>', methods=['POST'])
+@login_required
+def reject_product(product_id):
+    if current_user.role != 'admin':
+        return jsonify({'status': 'error', 'message': 'Unauthorized access.'}), 403
+
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'status': 'error', 'message': 'Product not found.'}), 404
+
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Product rejected and removed successfully.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
