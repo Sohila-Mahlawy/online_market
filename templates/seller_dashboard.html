@@ -1,0 +1,17 @@
+{% extends "seller_base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Newest Orders</h2>
+    <div class="orders-container">
+        {% for order in orders %}
+        <div class="order-box">
+            <p>User Email: {{ order.user_email }}</p>
+            <p>Product: {{ order.product.name }}</p>
+            <p>Delivery Time: {{ order.delivery_time }}</p>
+            <p>Status: {{ order.status }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

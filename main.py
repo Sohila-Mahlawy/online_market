@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_babel import Babel
 from werkzeug.utils import secure_filename
-from models import db, User, bcrypt, Seller, Product
+from models import db, User, bcrypt, Seller, Product, Order
 from forms import RegistrationForm, LoginForm, ProductForm
 from flask_wtf import CSRFProtect
 
@@ -53,6 +53,8 @@ admin = Admin(app)
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Product, db.session))
 admin.add_view(MyModelView(Seller, db.session))
+admin.add_view(MyModelView(Order, db.session))
+
 
 @app.route("/")
 @app.route("/home")
@@ -154,7 +156,8 @@ def dashboard():
     elif current_user.role == "seller":
         seller = Seller.query.filter_by(email=current_user.email).first()
         if seller and seller.authenticated:
-            return render_template("seller_dashboard.html")
+            orders = Order.query.filter_by(seller_id=current_user.id).order_by(Order.date.desc()).all()
+            return render_template('seller_dashboard.html', orders=orders)
         else:
             return redirect(url_for('pending'))
     if current_user.role == "user":
