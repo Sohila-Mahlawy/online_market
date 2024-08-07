@@ -1,0 +1,13 @@
+{% extends "user_base.html" %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 2em;">
+    <h1>Pending Account Approval</h1>
+    <p>Your request to become a seller is currently pending approval from the admin.</p>
+    <p>We will notify you via email once your account has been reviewed and accepted.</p>
+    <p>Thank you for your patience.</p>
+    <div style="margin-top: 2em;">
+        <a href="{{ url_for('home') }}" class="btn">Return to Home</a>
+    </div>
+</div>
+{% endblock %}

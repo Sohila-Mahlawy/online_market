@@ -1,0 +1,73 @@
+{% extends 'user_base.html' %}
+
+{% block content %}
+<div class="login-container">
+    <h2>Login</h2>
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.email.label }}<br>
+            {{ form.email(size=32, class_='form-control') }}<br>
+            {% for error in form.email.errors %}
+                <span class="error">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.password.label }}<br>
+            {{ form.password(size=32, class_='form-control') }}<br>
+            {% for error in form.password.errors %}
+                <span class="error">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class_='btn') }}
+        </div>
+    </form>
+</div>
+
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 2em auto;
+        padding: 2em;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .login-container h2 {
+        margin-bottom: 1em;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 1em;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5em;
+    }
+    .form-control {
+        width: 100%;
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 0.75em;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background: #555;
+    }
+    .error {
+        color: red;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}

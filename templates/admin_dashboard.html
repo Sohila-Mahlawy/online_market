@@ -1,0 +1,81 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    /* Additional styles for the admin dashboard */
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    .card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .card h3 {
+        margin-top: 0;
+    }
+    .card .details-button {
+        align-self: center;
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+    }
+    .card .details-button:hover {
+        background-color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- New Seller Requests -->
+    <div class="card">
+        <h3>New Seller Requests</h3>
+        <a href="/seller_requests" class="details-button">Details</a>
+    </div>
+
+    <!-- Product Requests -->
+    <div class="card">
+        <h3>Product Requests</h3>
+        <a href="/product_requests" class="details-button">Details</a>
+    </div>
+
+    <!-- New Categories -->
+    <div class="card">
+        <h3>New Categories</h3>
+        <a href="/category_requests" class="details-button">Details</a>
+    </div>
+
+    <!-- Assigning Orders -->
+    <div class="card">
+        <h3>Assign Orders</h3>
+        <a href="/order_assignments" class="details-button">Details</a>
+    </div>
+
+     <!-- Detailed Information -->
+    <div class="card">
+        <h3>Details</h3>
+        <ul>
+            <li>Total Sellers: 50</li>
+            <li>Total Products: 200</li>
+            <li>Total Orders: 150</li>
+            <li>Total Categories: 20</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

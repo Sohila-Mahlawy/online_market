@@ -1,0 +1,63 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}New Seller Requests{% endblock %}
+
+{% block head %}
+<style>
+    .seller-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .seller-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .seller-card h3 {
+        margin-top: 0;
+    }
+    .seller-card .info {
+        margin-bottom: 10px;
+    }
+    .seller-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .seller-card button:hover {
+        background-color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>New Seller Requests</h1>
+    <div class="seller-container">
+        {% for seller in sellers %}
+        <div class="seller-card">
+            <h3>{{ seller.email }}</h3>
+            <div class="info">Username: {{ seller.email.split('@')[0] }}</div>
+            <div class="info">Email: {{ seller.email }}</div>
+            <div class="info">Date Registered: {{ seller.date_registered.strftime('%Y-%m-%d') }}</div>
+            <form method="POST" action="/approve_seller/{{ seller.id }}" style="margin-bottom: 10px;">
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+            <form method="POST" action="/reject_seller/{{ seller.id }}">
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
