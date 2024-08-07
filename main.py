@@ -15,9 +15,15 @@ from flask_babel import Babel
 from werkzeug.utils import secure_filename
 from models import db, User, bcrypt, Seller, Product
 from forms import RegistrationForm, LoginForm, ProductForm
+from flask_wtf import CSRFProtect
+
+
 
 app = Flask(__name__)
 babel = Babel(app)
+csrf = CSRFProtect(app)
+
+
 
 # Load the configuration
 app.config.from_object('config.Config')
@@ -76,7 +82,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         if new_user.role == "seller":
-            new_seller = Seller(email=email, date_registered=datetime.utcnow())
+            new_seller = Seller(email=email, date_registered=datetime.utcnow(), phone_number=phone_number)
             db.session.add(new_seller)
             db.session.commit()
         flash('Your account has been created!', 'success')
@@ -154,6 +160,22 @@ def seller_requests():
         abort(403)
     sellers = Seller.query.filter_by(authenticated=False).all()
     return render_template("seller_requests.html", sellers=sellers)
+
+
+@app.route('/approve_seller/<int:seller_id>', methods=['POST'])
+@login_required
+@csrf.exempt  # If needed, you can also add this decorator to exempt the route from CSRF protection
+def approve_seller(seller_id):
+    if current_user.role != 'admin':
+        abort(403)
+    seller = Seller.query.get_or_404(seller_id)
+    if seller.authenticated:
+        return jsonify({'status': 'error', 'message': 'Seller already approved'})
+    seller.authenticated = True
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Seller approved'})
+
+# Similarly, add the reject route
 
 
 if __name__ == "__main__":

@@ -76,6 +76,9 @@ body {
             <a href="{{ url_for('home') }}" class="navbar-brand">Online Store</a>
             <ul class="navbar-nav">
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                 </li>
                 <li class="nav-item">
@@ -111,5 +114,11 @@ body {
             <p>&copy; 2024 Online Store. All rights reserved.</p>
         </div>
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var csrf_token = "{{ csrf_token() }}";
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

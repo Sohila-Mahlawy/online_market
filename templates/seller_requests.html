@@ -38,6 +38,7 @@
         background-color: #555;
     }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -45,19 +46,64 @@
     <h1>New Seller Requests</h1>
     <div class="seller-container">
         {% for seller in sellers %}
-        <div class="seller-card">
+        <div class="seller-card" id="seller-{{ seller.id }}">
             <h3>{{ seller.email }}</h3>
             <div class="info">Username: {{ seller.email.split('@')[0] }}</div>
             <div class="info">Email: {{ seller.email }}</div>
             <div class="info">Date Registered: {{ seller.date_registered.strftime('%Y-%m-%d') }}</div>
-            <form method="POST" action="/approve_seller/{{ seller.id }}" style="margin-bottom: 10px;">
-                <button type="submit" class="btn btn-success">Approve</button>
-            </form>
-            <form method="POST" action="/reject_seller/{{ seller.id }}">
-                <button type="submit" class="btn btn-danger">Reject</button>
-            </form>
+            <button class="approve-btn" data-id="{{ seller.id }}">Approve</button>
+            <button class="reject-btn" data-id="{{ seller.id }}">Reject</button>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    var csrftoken = "{{ csrf_token() }}";
+
+    $(".approve-btn").click(function() {
+        var sellerId = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: "/approve_seller/" + sellerId,
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#seller-" + sellerId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(response) {
+                alert("An error occurred while approving the seller.");
+            }
+        });
+    });
+
+    $(".reject-btn").click(function() {
+        var sellerId = $(this).data("id");
+        // Add your reject functionality here if needed
+        // $.ajax({
+        //     type: "POST",
+        //     url: "/reject_seller/" + sellerId,
+        //     headers: {
+        //         "X-CSRFToken": csrftoken
+        //     },
+        //     success: function(response) {
+        //         if (response.status === "success") {
+        //             $("#seller-" + sellerId).remove();
+        //         } else {
+        //             alert(response.message);
+        //         }
+        //     },
+        //     error: function(response) {
+        //         alert("An error occurred while rejecting the seller.");
+        //     }
+        // });
+    });
+});
+</script>
 {% endblock %}
