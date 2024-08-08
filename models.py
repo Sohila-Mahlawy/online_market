@@ -49,6 +49,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
+    color = db.Column(db.String(1000))
     category = db.Column(db.String(100), nullable=False)
     image1 = db.Column(db.String(120), nullable=True)
     image2 = db.Column(db.String(120), nullable=True)

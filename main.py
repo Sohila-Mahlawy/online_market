@@ -172,6 +172,7 @@ def seller_requests():
     if current_user.role != 'admin':
         abort(403)
     sellers = Seller.query.filter_by(authenticated=False).all()
+
     return render_template("seller_requests.html", sellers=sellers)
 
 
@@ -212,69 +213,87 @@ def reject_seller(seller_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
-
 @app.route("/add_product", methods=["GET", "POST"])
 @login_required
 def add_product():
     if current_user.role != 'seller':
-        abort(403)
+        abort(403)  # Only sellers can access this route
 
-    form = ProductForm()
-    if form.validate_on_submit():
-        product_name = form.name.data
-        price = form.price.data
-        category = form.category.data
-        stock = form.stock.data
-        user_id = current_user.id
-        seller_id = Seller.query.filter_by(email=current_user.email).first().id
+    # Fetch the seller associated with the current user
+    seller = Seller.query.filter_by(email=current_user.email).first()
 
-        image1 = form.image1.data
-        image2 = form.image2.data
-        image3 = form.image3.data
-        image4 = form.image4.data
+    # Check if the seller is authenticated
+    if seller and seller.authenticated:
+        form = ProductForm()
 
-        image1_filename = secure_filename(image1.filename) if image1 else None
-        image2_filename = secure_filename(image2.filename) if image2 else None
-        image3_filename = secure_filename(image3.filename) if image3 else None
-        image4_filename = secure_filename(image4.filename) if image4 else None
+        if form.validate_on_submit():
+            product_name = form.name.data
+            price = form.price.data
+            category = form.category.data
+            stock = form.stock.data
+            color = form.color.data
+            seller_id = seller.id
 
-        if image1:
-            image1.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image1_filename))
-        if image2:
-            image2.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image2_filename))
-        if image3:
-            image3.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image3_filename))
-        if image4:
-            image4.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image4_filename))
+            # Handle image uploads
+            image1 = form.image1.data
+            image2 = form.image2.data
+            image3 = form.image3.data
+            image4 = form.image4.data
 
-        product = Product(
-            name=product_name,
-            price=price,
-            category=category,
-            stock=stock,
-            user_id=user_id,
-            seller_id=seller_id,
-            image1=image1_filename,
-            image2=image2_filename,
-            image3=image3_filename,
-            image4=image4_filename
-        )
-        db.session.add(product)
-        db.session.commit()
+            image1_filename = secure_filename(image1.filename) if image1 else None
+            image2_filename = secure_filename(image2.filename) if image2 else None
+            image3_filename = secure_filename(image3.filename) if image3 else None
+            image4_filename = secure_filename(image4.filename) if image4 else None
 
-        flash('Product has been added!', 'success')
-        return redirect(url_for('dashboard'))
+            # Save the images to the upload folder
+            if image1:
+                image1.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image1_filename))
+            if image2:
+                image2.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image2_filename))
+            if image3:
+                image3.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image3_filename))
+            if image4:
+                image4.save(os.path.join(current_app.config['UPLOAD_FOLDER'], image4_filename))
 
-    return render_template("add_product.html", form=form)
+            # Create a new Product object
+            product = Product(
+                name=product_name,
+                price=price,
+                category=category,
+                stock=stock,
+                color=color,
+                seller_id=seller_id,
+                user_id = current_user.id,
+                image1=image1_filename,
+                image2=image2_filename,
+                image3=image3_filename,
+                image4=image4_filename
+            )
+
+            # Add and commit the new product to the database
+            db.session.add(product)
+            db.session.commit()
+
+            flash('Product has been added!', 'success')
+            return redirect(url_for('dashboard'))
+
+        return render_template("add_product.html", form=form)
+    else:
+        return redirect(url_for('pending'))  # Redirect to the pending page if the seller is not authenticated
 
 
 @app.route('/my_products')
 @login_required
 def my_products():
-    # Query products belonging to the current user
-    products = Product.query.filter_by(seller_id=current_user.id).all()
+    if current_user.role != 'seller':
+        abort(403)
+    seller = Seller.query.filter_by(email=current_user.email).first()
+    if seller and seller.authenticated:
+        products = Product.query.filter_by(seller_id=seller.id).all()
+        return render_template('my_products.html', products=products)
+    else:
+        return redirect(url_for('pending'))
 
-    return render_template('my_products.html', products=products)
 
 
 @app.route('/product_requests')
@@ -325,6 +344,20 @@ def reject_product(product_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@app.route('/view_details/<int:product_id>')
+@login_required
+def view_details(product_id):
+    product = Product.query.get_or_404(product_id)
+    if current_user.role == 'seller':
+        return render_template('view_details_seller.html', product=product)
+    elif current_user.role == 'admin':
+        return render_template('view_details_admin.html', product=product)
+    elif current_user.role == 'user':
+        return render_template('view_details_user.html', product=product)
+    else:
+        abort(403)  # Forbidden
 
 
 if __name__ == "__main__":

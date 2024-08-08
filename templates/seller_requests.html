@@ -49,6 +49,7 @@
             <h3>{{ seller.email }}</h3>
             <div class="info">Username: {{ seller.email.split('@')[0] }}</div>
             <div class="info">Email: {{ seller.email }}</div>
+
             <div class="info">Date Registered: {{ seller.date_registered.strftime('%Y-%m-%d') }}</div>
             <button class="approve-btn" data-id="{{ seller.id }}">Approve</button>
             <button class="reject-btn" data-id="{{ seller.id }}">Reject</button>
