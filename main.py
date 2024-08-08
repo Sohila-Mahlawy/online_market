@@ -307,12 +307,12 @@ def product_requests():
 
     # Create a dictionary to map product IDs to seller emails
     seller_emails = {}
-
     for product in products:
         seller = Seller.query.get(product.seller_id)
         seller_emails[product.id] = seller.email if seller else 'Unknown'
-    print(seller_emails)
+
     return render_template("product_requests.html", products=products, seller_emails=seller_emails)
+
 
 
 @app.route('/approve_product/<int:product_id>', methods=['POST'])
@@ -350,14 +350,26 @@ def reject_product(product_id):
 @login_required
 def view_details(product_id):
     product = Product.query.get_or_404(product_id)
+    seller_email = 'Unknown'
+
+    # Fetch the seller email for the product
+    seller = Seller.query.get(product.seller_id)
+    seller_email = seller.email
+
     if current_user.role == 'seller':
-        return render_template('product_details_seller.html', product=product)
+        return render_template('product_details_seller.html', product=product, seller_email=seller_email)
     elif current_user.role == 'admin':
-        return render_template('product_details_admin.html', product=product)
+        return render_template('product_details_admin.html', product=product, seller_email=seller_email)
     elif current_user.role == 'user':
-        return render_template('product_details_user.html', product=product)
+        return render_template('product_details_user.html', product=product, seller_email=seller_email)
     else:
         abort(403)  # Forbidden
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

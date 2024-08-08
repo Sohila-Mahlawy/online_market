@@ -125,11 +125,12 @@
         <!-- Right side: Product Details -->
         <div class="product-info-box">
             <div class="product-info">
-                <div><label>Price:</label> ${{ product.price }}</div>
-                <div><label>Category:</label> {{ product.category }}</div>
-                <div><label>Stock:</label> {{ product.stock }}</div>
-                <div><label>Color:</label> {{ product.color }}</div>
-                <div><label>Authenticated:</label> {{ product.authenticated }}</div>
+                <h3>{{ product.name }}</h3>
+            <div class="info">Seller Email: {{ seller_email }}</div>
+            <div class="info">Price: ${{ product.price }}</div>
+            <div class="info">Category: {{ product.category }}</div>
+            <div class="info">Stock: {{ product.stock }}</div>
+            <div class="info">Color: {{ product.color }}</div>
 
                 <!-- Conditional Buttons -->
                 {% if product.authenticated %}
@@ -199,7 +200,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === "success") {
                     alert("Product approved successfully.");
-                    window.location.reload();
+                    window.location.href = "/product_requests";
                 } else {
                     alert(response.message);
                 }
@@ -222,7 +223,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === "success") {
                     alert("Product rejected successfully.");
-                    window.location.reload();
+                    window.location.href = "/product_requests";
                 } else {
                     alert(response.message);
                 }
@@ -234,4 +235,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
 {% endblock %}
