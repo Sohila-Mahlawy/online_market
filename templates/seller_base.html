@@ -3,72 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
     <style>
+        /* Global Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            color: #333;
         }
-
         header {
-            background: #333;
+            background-color: #333;
             color: white;
-            padding: 1em 0;
         }
-
-        nav .container {
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+        }
+        .navbar-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
         }
-
-        nav .brand {
-            font-size: 1.5em;
-            font-weight: bold;
+        .navbar-brand {
             color: white;
             text-decoration: none;
+            font-size: 24px;
         }
-
-        .nav-links {
+        .navbar-nav {
             list-style: none;
             display: flex;
-            gap: 1em;
+            gap: 15px;
         }
-
-        .nav-links li a {
+        .nav-item {
+            display: inline;
+        }
+        .nav-link {
             color: white;
             text-decoration: none;
         }
-
-        .nav-links .search-form {
-            display: flex;
-            align-items: center;
+        .nav-link:hover {
+            text-decoration: underline;
         }
-
-        .nav-links .search-form input {
-            padding: 0.5em;
-            border: none;
-            border-radius: 5px;
+        .notification-icon {
+            width: 24px;
+            height: 24px;
         }
-
-        .nav-links .search-form button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        main {
-            flex: 1;
-        }
-
-        footer {
+          footer {
             background: #f1f1f1;
             padding: 2em 0;
             text-align: center;
@@ -112,84 +95,52 @@
             margin-top: 2em;
         }
 
-        /* Custom form styling for product addition */
-        .container.mt-5 {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .search-form {
+            display: flex;
         }
-
-        .container.mt-5 h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #343a40;
-            text-align: center;
+        .search-form input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 5px;
         }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-control-label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #495057;
-        }
-
-        .form-control,
-        .form-control-file {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
-            box-sizing: border-box;
-        }
-
-        .form-control-file {
-            padding: 3px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
+        .search-form button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
         }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
+        .search-form button:hover {
+            background-color: #555;
+        }
+        main {
+            padding: 20px;
         }
     </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
     <header>
-        <nav>
-            <div class="container">
-                <a href="{{ url_for('home') }}" class="brand">Online Store</a>
-                <ul class="nav-links">
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="/home">Home</a></li>
-                    <li><a href="/my_products">My Products</a></li>
-                    <li><a href="/my_orders">My Orders</a></li>
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="{{ url_for('home') }}" class="navbar-brand">Online Store</a>
+                <ul class="navbar-nav">
+                    <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+                    <li><a href="/home" class="nav-link">Home</a></li>
+                    <li><a href="/my_products" class="nav-link">My Products</a></li>
+                    <li><a href="/my_orders" class="nav-link">My Orders</a></li>
                     <li>
                         <form action="/search" method="get" class="search-form">
                             <input type="text" name="q" placeholder="Search products...">
-                            <button type="submit"><i class="fas fa-search"></i></button>
+                            <button type="submit"><i class="fas fa-search"></i> Search</button>
                         </form>
                     </li>
-                    <li><a href="/add_product">Add Product</a></li>
-                    <li><a href="/remove_product">Remove Product</a></li>
-                    <li><a href="/category_request">Category Request</a></li>
-                    <li><a href="/logout">Logout</a></li>
+                    <li><a href="/add_product" class="nav-link">Add Product</a></li>
+                    <li><a href="/remove_product" class="nav-link">Remove Product</a></li>
+                    <li><a href="/category_request" class="nav-link">Category Request</a></li>
+                    <li><a href="/logout" class="nav-link">Logout</a></li>
                 </ul>
             </div>
         </nav>
