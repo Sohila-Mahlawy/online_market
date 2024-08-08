@@ -1,0 +1,185 @@
+{% extends 'seller_base.html' %}
+
+{% block head %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+    .product-details {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+    .product-images {
+        flex: 1;
+        max-width: 50%;
+    }
+    .product-info-box {
+        flex: 1;
+        max-width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .product-details h2 {
+        text-align: center;
+    }
+    .carousel {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+    .carousel-item {
+        min-width: 100%;
+        box-sizing: border-box;
+    }
+    .carousel-item img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    .carousel-control {
+        position: absolute;
+        top: 50%;
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+    .carousel-control.prev {
+        left: 10px;
+    }
+    .carousel-control.next {
+        right: 10px;
+    }
+    .product-info {
+        margin-bottom: 15px;
+    }
+    .product-info label {
+        font-weight: bold;
+        display: block;
+    }
+    .product-info div {
+        margin-bottom: 5px;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="product-details">
+
+        <!-- Left side: Product Images -->
+        <div class="product-images">
+            <h2>{{ product.name }}</h2>
+            <!-- Carousel for Product Images -->
+            <div class="carousel">
+                <div class="carousel-inner">
+                    {% if product.image1 %}
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="Image 1">
+                    </div>
+                    {% endif %}
+                    {% if product.image2 %}
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image2) }}" alt="Image 2">
+                    </div>
+                    {% endif %}
+                    {% if product.image3 %}
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image3) }}" alt="Image 3">
+                    </div>
+                    {% endif %}
+                    {% if product.image4 %}
+                    <div class="carousel-item">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image4) }}" alt="Image 4">
+                    </div>
+                    {% endif %}
+                </div>
+                <button class="carousel-control prev">&#9664;</button>
+                <button class="carousel-control next">&#9654;</button>
+            </div>
+        </div>
+
+        <!-- Right side: Product Details -->
+        <div class="product-info-box">
+            <div class="product-info">
+                <div><label>Price:</label> ${{ product.price }}</div>
+                <div><label>Category:</label> {{ product.category }}</div>
+                <div><label>Stock:</label> {{ product.stock }}</div>
+                <div><label>Color:</label> {{ product.color }}</div>
+                <div><label>Authenticated:</label> {{ product.authenticated }}</div>
+                <a href="/edit_product/{{ product.id }}"><button class="btn btn-success btn-sm edit-btn">Edit</button></a>
+                <a href="/delete_product/{{ product.id }}"><button class="btn btn-success btn-sm edit-btn">Delete</button></a>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    function initializeCarousel() {
+        var $carousel = $('.carousel');
+        var $inner = $carousel.find('.carousel-inner');
+        var $items = $inner.find('.carousel-item');
+        var totalSlides = $items.length;
+        var currentIndex = 0;
+
+        function showSlide(index) {
+            if (totalSlides === 0) return;
+
+            if (index >= totalSlides) {
+                currentIndex = 0;
+            } else if (index < 0) {
+                currentIndex = totalSlides - 1;
+            } else {
+                currentIndex = index;
+            }
+
+            var offset = -currentIndex * 100;
+            $inner.css('transform', 'translateX(' + offset + '%)');
+        }
+
+        $carousel.find('.carousel-control.next').click(function() {
+            showSlide(currentIndex + 1);
+        });
+
+        $carousel.find('.carousel-control.prev').click(function() {
+            showSlide(currentIndex - 1);
+        });
+
+        // Initialize the slider
+        showSlide(currentIndex);
+    }
+
+    // Initialize carousel on page load
+    initializeCarousel();
+});
+</script>
+{% endblock %}

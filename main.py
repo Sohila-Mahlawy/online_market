@@ -351,11 +351,11 @@ def reject_product(product_id):
 def view_details(product_id):
     product = Product.query.get_or_404(product_id)
     if current_user.role == 'seller':
-        return render_template('view_details_seller.html', product=product)
+        return render_template('product_details_seller.html', product=product)
     elif current_user.role == 'admin':
-        return render_template('view_details_admin.html', product=product)
+        return render_template('product_details_admin.html', product=product)
     elif current_user.role == 'user':
-        return render_template('view_details_user.html', product=product)
+        return render_template('product_details_user.html', product=product)
     else:
         abort(403)  # Forbidden
 
