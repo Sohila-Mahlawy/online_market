@@ -277,15 +277,24 @@ def my_products():
     return render_template('my_products.html', products=products)
 
 
-
 @app.route('/product_requests')
 @login_required
 def product_requests():
     if current_user.role != 'admin':
         abort(403)
+
     # Query products that need admin approval
     products = Product.query.filter_by(authenticated=False).all()
-    return render_template("product_requests.html", products=products)
+
+    # Create a dictionary to map product IDs to seller emails
+    seller_emails = {}
+
+    for product in products:
+        seller = Seller.query.get(product.seller_id)
+        seller_emails[product.id] = seller.email if seller else 'Unknown'
+    print(seller_emails)
+    return render_template("product_requests.html", products=products, seller_emails=seller_emails)
+
 
 @app.route('/approve_product/<int:product_id>', methods=['POST'])
 @login_required
