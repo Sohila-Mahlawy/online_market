@@ -1,6 +1,6 @@
 {% extends 'admin_base.html' %}
 
-{% block title %}New Products Requests{% endblock %}
+{% block title %}Product Requests{% endblock %}
 
 {% block head %}
 <style>
@@ -22,6 +22,14 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        text-align: center;
+    }
+    .seller-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-bottom: 10px;
     }
     .seller-card h3 {
         margin-top: 0;
@@ -61,47 +69,6 @@
     .text-center {
         text-align: center;
     }
-    .carousel {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        border-radius: 8px;
-    }
-    .carousel-inner {
-        display: flex;
-        transition: transform 0.5s ease;
-    }
-    .carousel-item {
-        min-width: 100%;
-        box-sizing: border-box;
-    }
-    .carousel-item img {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-    }
-    .carousel-control {
-        position: absolute;
-        top: 50%;
-        width: 50px;
-        height: 50px;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transform: translateY(-50%);
-        z-index: 10;
-    }
-    .carousel-control.prev {
-        left: 10px;
-    }
-    .carousel-control.next {
-        right: 10px;
-    }
 </style>
 {% endblock %}
 
@@ -111,41 +78,17 @@
     <div class="seller-container">
         {% for product in products %}
         <div class="seller-card" id="product-{{ product.id }}">
+            {% if product.image1 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="{{ product.name }}">
+            {% endif %}
             <h3>{{ product.name }}</h3>
             <div class="info">Seller Email: {{ seller_emails[product.id] }}</div>
-
             <div class="info">Price: ${{ product.price }}</div>
             <div class="info">Category: {{ product.category }}</div>
             <div class="info">Stock: {{ product.stock }}</div>
             <div class="info">Color: {{ product.color }}</div>
-
-            <div class="carousel">
-                <div class="carousel-inner">
-                    {% if product.image1 %}
-                    <div class="carousel-item">
-                        <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="Image 1">
-                    </div>
-                    {% endif %}
-                    {% if product.image2 %}
-                    <div class="carousel-item">
-                        <img src="{{ url_for('static', filename='uploads/' + product.image2) }}" alt="Image 2">
-                    </div>
-                    {% endif %}
-                    {% if product.image3 %}
-                    <div class="carousel-item">
-                        <img src="{{ url_for('static', filename='uploads/' + product.image3) }}" alt="Image 3">
-                    </div>
-                    {% endif %}
-                    {% if product.image4 %}
-                    <div class="carousel-item">
-                        <img src="{{ url_for('static', filename='uploads/' + product.image4) }}" alt="Image 4">
-                    </div>
-                    {% endif %}
-                </div>
-                <button class="carousel-control prev">&#9664;</button>
-                <button class="carousel-control next">&#9654;</button>
-            </div>
             <div>
+                <a href="/view_details/{{ product.id }}"><button class="btn btn-success btn-sm">View Details</button></a>
                 <button class="btn btn-success btn-sm approve-btn" data-id="{{ product.id }}">Approve</button>
                 <button class="btn btn-danger btn-sm reject-btn" data-id="{{ product.id }}">Reject</button>
             </div>
@@ -161,36 +104,6 @@
 <script>
 $(document).ready(function() {
     var csrfToken = "{{ csrf_token() }}";
-    var currentIndex = 0;
-
-    function showSlide(index) {
-        var slides = $('.carousel-item');
-        var totalSlides = slides.length;
-
-        if (totalSlides === 0) return;
-
-        if (index >= totalSlides) {
-            currentIndex = 0;
-        } else if (index < 0) {
-            currentIndex = totalSlides - 1;
-        } else {
-            currentIndex = index;
-        }
-
-        var offset = -currentIndex * 100;
-        $('.carousel-inner').css('transform', 'translateX(' + offset + '%)');
-    }
-
-    $('.carousel-control.next').click(function() {
-        showSlide(currentIndex + 1);
-    });
-
-    $('.carousel-control.prev').click(function() {
-        showSlide(currentIndex - 1);
-    });
-
-    // Initialize the slider
-    showSlide(currentIndex);
 
     $(".approve-btn").click(function() {
         var productId = $(this).data("id");
