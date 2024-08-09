@@ -55,6 +55,8 @@ admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Product, db.session))
 admin.add_view(MyModelView(Seller, db.session))
 admin.add_view(MyModelView(Order, db.session))
+admin.add_view(MyModelView(Category, db.session))
+
 
 
 @app.route("/")
@@ -229,10 +231,18 @@ def add_product():
         if form.validate_on_submit():
             product_name = form.name.data
             price = form.price.data
-            category = form.category.data
+            category_id = form.category.data
             stock = form.stock.data
             color = form.color.data
             seller_id = seller.id
+
+            # Fetch the category from the database
+            category = Category.query.get(category_id)
+
+            # Check if the price exceeds the category's maximum price
+            if price > category.price:
+                flash(f'The product could not be saved because the maximum price for the category "{category.name}" is {category.price}.', 'danger')
+                return render_template("add_product.html", form=form)
 
             # Handle image uploads
             image1 = form.image1.data
@@ -259,11 +269,11 @@ def add_product():
             product = Product(
                 name=product_name,
                 price=price,
-                category=category,
+                category_id=category_id,
                 stock=stock,
                 color=color,
                 seller_id=seller_id,
-                user_id = current_user.id,
+                user_id=current_user.id,
                 image1=image1_filename,
                 image2=image2_filename,
                 image3=image3_filename,
@@ -280,6 +290,7 @@ def add_product():
         return render_template("add_product.html", form=form)
     else:
         return redirect(url_for('pending'))  # Redirect to the pending page if the seller is not authenticated
+
 
 
 @app.route('/my_products')

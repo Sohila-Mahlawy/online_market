@@ -3,6 +3,16 @@
 {% block content %}
 <div class="add-product-container">
     <h2>Add New Product</h2>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
@@ -86,6 +96,9 @@
     }
     .btn:hover {
         background: #555;
+    }
+    .alert {
+        margin-bottom: 1em;
     }
 </style>
 {% endblock %}

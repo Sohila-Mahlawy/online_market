@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, DecimalField, SubmitField, IntegerField, PasswordField, SelectField, FileField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from flask_wtf.file import FileAllowed
-from models import User
+from models import User, Category, Seller, Product
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -32,14 +32,18 @@ class LoginForm(FlaskForm):
 class ProductForm(FlaskForm):
     name = StringField('Product Name', validators=[DataRequired()])
     price = DecimalField('Price', validators=[DataRequired(), NumberRange(min=0.01)])
-    category = SelectField('Category', choices=[('electronics', 'Electronics'), ('fashion', 'Fashion'), ('home', 'Home'), ('toys', 'Toys'), ('books', 'Books')], validators=[DataRequired()])
+    category = SelectField('Category', coerce=int, validators=[DataRequired()])
     stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=1)])
-    color = StringField('Color',validators=[DataRequired()])
+    color = StringField('Color', validators=[DataRequired()])
     image1 = FileField('Image 1', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     image2 = FileField('Image 2', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     image3 = FileField('Image 3', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     image4 = FileField('Image 4', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField('Add Product')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.category.choices = [(category.id, category.name) for category in Category.query.all()]
 
 class CategoryForm(FlaskForm):
     name = StringField('Category Name', validators=[DataRequired(), Length(min=2, max=80)])
