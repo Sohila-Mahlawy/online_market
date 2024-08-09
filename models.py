@@ -74,3 +74,11 @@ class Product(db.Model):
             db.session.commit()
             return True, "Purchase successful!"
         return False, "Product out of stock."
+
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False, unique=True)
+    price = db.Column(db.Integer, nullable=True)
+    def __repr__(self):
+        return f'<Category {self.name}>'

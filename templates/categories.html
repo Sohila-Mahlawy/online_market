@@ -1,0 +1,101 @@
+<!-- templates/admin/categories.html -->
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="categories-container">
+    <div class="manage-categories">
+        <h1>Manage Categories</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.name.label(class="form-control-label") }}
+                {{ form.name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.price.label(class="form-control-label") }}
+                {{ form.price(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+
+    <div class="existing-categories">
+        <h2>Existing Categories</h2>
+        <ul>
+            {% for category in categories %}
+            <li>{{ category.name }}: {{ category.price }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<style>
+    .categories-container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 900px;
+        margin: 2em auto;
+    }
+    .manage-categories {
+        flex: 1;
+        margin-right: 2em;
+        padding: 2em;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .manage-categories h1 {
+        text-align: center;
+        margin-bottom: 1em;
+    }
+    .form-group {
+        margin-bottom: 1em;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5em;
+    }
+    .form-control {
+        width: 100%;
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 0.75em;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background: #555;
+    }
+    .existing-categories {
+        flex: 1;
+        padding: 2em;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .existing-categories h2 {
+        text-align: center;
+        margin-bottom: 1em;
+    }
+    .existing-categories ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .existing-categories li {
+        padding: 0.5em 0;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% endblock %}

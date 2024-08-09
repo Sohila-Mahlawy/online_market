@@ -40,3 +40,8 @@ class ProductForm(FlaskForm):
     image3 = FileField('Image 3', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     image4 = FileField('Image 4', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField('Add Product')
+
+class CategoryForm(FlaskForm):
+    name = StringField('Category Name', validators=[DataRequired(), Length(min=2, max=80)])
+    price = IntegerField(validators=[DataRequired()])
+    submit = SubmitField('Create/Update Category')

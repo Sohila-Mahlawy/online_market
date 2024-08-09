@@ -14,8 +14,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_babel import Babel
 from werkzeug.utils import secure_filename
-from models import db, User, bcrypt, Seller, Product, Order
-from forms import RegistrationForm, LoginForm, ProductForm
+from models import db, User, bcrypt, Seller, Product, Order, Category
+from forms import RegistrationForm, LoginForm, ProductForm, CategoryForm
 from flask_wtf import CSRFProtect
 
 
@@ -366,10 +366,19 @@ def view_details(product_id):
         abort(403)  # Forbidden
 
 
+@app.route('/categories', methods=['GET', 'POST'])
+def manage_categories():
+    form = CategoryForm()
+    categories = Category.query.all()
 
+    if form.validate_on_submit():
+        category = Category(name=form.name.data, price=form.price.data)
+        db.session.add(category)
+        db.session.commit()
+        flash('Category created successfully!', 'success')
+        return redirect(url_for('manage_categories'))
 
-
-
+    return render_template('categories.html', form=form, categories=categories)
 
 
 if __name__ == "__main__":
