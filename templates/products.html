@@ -1,0 +1,59 @@
+{% if user.role == "user" %}
+    {% extends 'user_base.html' %}
+{% elif user.role == "admin" %}
+    {% extends 'admin_base.html' %}
+{% elif user.role == "seller" %}
+    {% extends 'seller_base.html' %}
+{% endif %}
+
+{% block title %}{{ category_name }} Products{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ category_name }} Products</h2>
+    <div class="product-container">
+        {% for product in products %}
+        <div class="product-card">
+            {% if product.image1 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="{{ product.name }}">
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            <p>${{ product.price }}</p>
+            <p>Stock: {{ product.stock }}</p>
+            <p>Color: {{ product.color }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .container {
+        padding: 20px;
+    }
+    .product-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .product-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        text-align: center;
+    }
+    .product-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-bottom: 10px;
+    }
+    .product-card h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}

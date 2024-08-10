@@ -164,9 +164,16 @@ def dashboard():
         else:
             return redirect(url_for('pending'))
     if current_user.role == "user":
-        return render_template("user_dashboard.html")
+        categories = Category.query.all()
+        return render_template('user_dashboard.html', categories=categories)
     else:
         return redirect(url_for('home'))
+
+
+@app.route('/products/<category_name>')
+def category_products(category_name):
+    products = Product.query.filter_by(category=category_name).all()
+    return render_template('products.html', products=products, category_name=category_name, user=current_user)
 
 @app.route("/seller_requests")
 @login_required
@@ -365,7 +372,7 @@ def edit_product(product_id):
         flash('Product has been updated!', 'success')
 
         if current_user.role == "admin":
-            return redirect("/products")
+            return redirect("/product_categories")
         elif current_user.role == "seller":
             return redirect(url_for('my_products'))
 
@@ -476,6 +483,8 @@ def manage_categories():
         return redirect(url_for('manage_categories'))
 
     return render_template('categories.html', form=form, categories=categories)
+
+
 
 
 if __name__ == "__main__":

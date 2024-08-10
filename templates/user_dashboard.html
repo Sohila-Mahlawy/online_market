@@ -1,0 +1,50 @@
+{% extends 'user_base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Categories</h2>
+    <div class="category-container">
+        {% for category in categories %}
+        <div class="category-card">
+            <a href="{{ url_for('category_products', category_name=category.name) }}">
+                <h3>{{ category.name }}</h3>
+                <p>Maximum Price ${{ category.price }}</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .container {
+        padding: 20px;
+    }
+    .category-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .category-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        text-align: center;
+    }
+    .category-card a {
+        text-decoration: none;
+        color: #333;
+    }
+    .category-card a:hover h3 {
+        color: #007bff;
+    }
+    .category-card h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}

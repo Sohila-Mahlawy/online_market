@@ -1,34 +1,63 @@
-{% extends 'user_base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shopping</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 50px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 40px;
+        }
+        .btn {
+            background-color: #001f3f; /* Navy color */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3; /* Slightly lighter navy */
+        }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<section class="hero">
     <div class="container">
-        <h1>Welcome to Online Store</h1>
-        <p>Your one-stop shop for everything you need. Explore our wide range of products and find amazing deals.</p>
-        <a href="/products" class="btn">Shop Now</a>
+        <h1>Welcome to Online Shopping</h1>
+        <p>Your one-stop shop for all your needs. Explore our wide range of products today.</p>
+        <a href="/register" class="btn">Register</a>
+        <a href="/login" class="btn">Login</a>
     </div>
-</section>
-
-<section class="featured-products">
-    <div class="container">
-        <h2>Featured Products</h2>
-        <div class="product-grid">
-            {% for product in featured_products %}
-            <div class="product-card">
-                <img src="{{ product.image_url }}" alt="{{ product.name }}">
-                <h3>{{ product.name }}</h3>
-                <p>${{ product.price }}</p>
-                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn">View Details</a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="about-us">
-    <div class="container">
-        <h2>About Us</h2>
-        <p>At Online Store, we are dedicated to providing you with the best online shopping experience. With a wide range of products from electronics to fashion, we ensure quality and affordability. Shop with confidence and discover the latest trends and unbeatable prices.</p>
-    </div>
-</section>
-{% endblock %}
+</body>
+</html>
