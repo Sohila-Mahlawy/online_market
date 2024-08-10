@@ -170,10 +170,6 @@ def dashboard():
         return redirect(url_for('home'))
 
 
-@app.route('/products/<category_name>')
-def category_products(category_name):
-    products = Product.query.filter_by(category=category_name).all()
-    return render_template('products.html', products=products, category_name=category_name, user=current_user)
 
 @app.route("/seller_requests")
 @login_required
@@ -222,10 +218,6 @@ def reject_seller(seller_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
-from flask import render_template, redirect, url_for, flash
-from flask_login import current_user, login_required
-from werkzeug.utils import secure_filename
-import os
 
 from flask import render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
@@ -483,6 +475,12 @@ def manage_categories():
         return redirect(url_for('manage_categories'))
 
     return render_template('categories.html', form=form, categories=categories)
+
+
+@app.route('/products/<category_name>')
+def category_products(category_name):
+    products = Product.query.filter_by(category=category_name).all()
+    return render_template('products.html', products=products, category_name=category_name, user=current_user)
 
 
 

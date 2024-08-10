@@ -164,6 +164,73 @@
                 margin: 1em 0;
             }
         }
+              /* Carousel Styles */
+
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .carousel {
+    position: relative;
+    width: 80%; /* Adjust width to limit the carousel size */
+    max-width: 600px; /* Optional: Set a max width */
+    margin: 0 auto; /* Center the carousel */
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover; /* Ensure images maintain their aspect ratio */
+}
+
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        .carousel-control.prev {
+            left: 10px;
+        }
+        .carousel-control.next {
+            right: 10px;
+        }
+.btn-success, .btn-danger {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-success:hover {
+        background-color: #28a745;
+    }
+    .btn-danger:hover {
+        background-color: #dc3545;
+    }
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 5px 10px;
+    }
+
     </style>
 </head>
 <body>
@@ -237,6 +304,49 @@
         document.getElementById('nav-toggle').addEventListener('click', function() {
             document.getElementById('nav-links').classList.toggle('active');
         });
+    </script>
+
+    <!-- Carousel JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        function initializeCarousel() {
+            var $carousel = $('.carousel');
+            var $inner = $carousel.find('.carousel-inner');
+            var $items = $inner.find('.carousel-item');
+            var totalSlides = $items.length;
+            var currentIndex = 0;
+
+            function showSlide(index) {
+                if (totalSlides === 0) return;
+
+                if (index >= totalSlides) {
+                    currentIndex = 0;
+                } else if (index < 0) {
+                    currentIndex = totalSlides - 1;
+                } else {
+                    currentIndex = index;
+                }
+
+                var offset = -currentIndex * 100;
+                $inner.css('transform', 'translateX(' + offset + '%)');
+            }
+
+            $carousel.find('.carousel-control.next').click(function() {
+                showSlide(currentIndex + 1);
+            });
+
+            $carousel.find('.carousel-control.prev').click(function() {
+                showSlide(currentIndex - 1);
+            });
+
+            // Initialize the slider
+            showSlide(currentIndex);
+        }
+
+        // Initialize carousel on page load
+        initializeCarousel();
+    });
     </script>
 </body>
 </html>
