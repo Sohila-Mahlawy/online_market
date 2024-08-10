@@ -215,6 +215,17 @@ def reject_seller(seller_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
+from flask import render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+import os
+
+from flask import render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+import os
+
+
 @app.route("/add_product", methods=["GET", "POST"])
 @login_required
 def add_product():
@@ -269,7 +280,7 @@ def add_product():
             product = Product(
                 name=product_name,
                 price=price,
-                category_id=category_id,
+                category=category.name,
                 stock=stock,
                 color=color,
                 seller_id=seller_id,
@@ -304,6 +315,81 @@ def my_products():
         return render_template('my_products.html', products=products)
     else:
         return redirect(url_for('pending'))
+
+
+@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def edit_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    if current_user.role not in ["admin", "seller"]:
+        abort(403)  # Only admins or sellers can access this route
+
+    form = ProductForm(obj=product)
+
+    if form.validate_on_submit():
+        # Validate price against category price
+        category = Category.query.get(form.category.data)
+        if form.price.data > category.price:
+            form.price.errors.append(f"Price cannot exceed the category price of {category.price}.")
+            return render_template('edit_product.html', form=form, product=product, user=current_user)
+
+        # Update product details
+        product.name = form.name.data
+        product.price = form.price.data
+        product.category = category.name
+        product.stock = form.stock.data
+        product.color = form.color.data
+
+        # Handle image uploads
+        image1 = form.image1.data
+        image2 = form.image2.data
+        image3 = form.image3.data
+        image4 = form.image4.data
+
+        if image1:
+            product.image1 = secure_filename(image1.filename)
+            image1.save(os.path.join(current_app.config['UPLOAD_FOLDER'], product.image1))
+        if image2:
+            product.image2 = secure_filename(image2.filename)
+            image2.save(os.path.join(current_app.config['UPLOAD_FOLDER'], product.image2))
+        if image3:
+            product.image3 = secure_filename(image3.filename)
+            image3.save(os.path.join(current_app.config['UPLOAD_FOLDER'], product.image3))
+        if image4:
+            product.image4 = secure_filename(image4.filename)
+            image4.save(os.path.join(current_app.config['UPLOAD_FOLDER'], product.image4))
+
+        # Commit changes to the database
+        db.session.commit()
+        flash('Product has been updated!', 'success')
+
+        if current_user.role == "admin":
+            return redirect("/products")
+        elif current_user.role == "seller":
+            return redirect(url_for('my_products'))
+
+    return render_template('edit_product.html', form=form, product=product, user=current_user)
+
+
+@app.route('/delete_product/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    if current_user.role == "user":
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        flash('Product deleted successfully.', 'success')
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting product: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
 
 
 

@@ -180,6 +180,40 @@ $(document).ready(function() {
 
     // Initialize carousel on page load
     initializeCarousel();
+
+    // Delete Product
+    $(".btn-danger").click(function(e) {
+        e.preventDefault();
+        if (confirm("Are you sure you want to delete this product?")) {
+            var deleteUrl = $(this).closest("a").attr("href");
+            $.ajax({
+                type: "POST",
+                url: deleteUrl,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.status === "success") {
+                        alert("Product deleted successfully.");
+                        window.location.href = "/my_products";
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(response) {
+                    alert("An error occurred while deleting the product.");
+                }
+            });
+        }
+    });
+
+    // Edit Product
+    $(".btn-success").click(function(e) {
+        e.preventDefault();
+        var editUrl = $(this).closest("a").attr("href");
+        window.location.href = editUrl;
+    });
 });
 </script>
+
 {% endblock %}

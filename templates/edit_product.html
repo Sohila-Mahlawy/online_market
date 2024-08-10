@@ -1,0 +1,112 @@
+{% if user.role == "seller" %}
+{% extends "seller_base.html" %}
+{% elif user.role == "admin" %}
+{% extends "admin_base.html" %}
+{% endif %}
+{% block content %}
+<div class="container add-product-container">
+    <h2>Edit Product</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        {% if form.price.errors %}
+        <div class="alert alert-danger">
+            {% for error in form.price.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            {{ form.name.label }} {{ form.name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.price.label }} {{ form.price(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.category.label }} {{ form.category(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.stock.label }} {{ form.stock(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.color.label }} {{ form.color(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.image1.label }} {{ form.image1(class="form-control-file") }}
+            {% if product.image1 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="Image 1" width="100">
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.image2.label }} {{ form.image2(class="form-control-file") }}
+            {% if product.image2 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image2) }}" alt="Image 2" width="100">
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.image3.label }} {{ form.image3(class="form-control-file") }}
+            {% if product.image3 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image3) }}" alt="Image 3" width="100">
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.image4.label }} {{ form.image4(class="form-control-file") }}
+            {% if product.image4 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image4) }}" alt="Image 4" width="100">
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <br>
+        {% if user.role == "admin" %}
+        <a href="/products" class="btn btn-secondary">Cancel</a>
+        {% elif user.role == "seller" %}
+        <a href="{{ url_for('my_products') }}" class="btn btn-secondary">Cancel</a>
+        {% endif %}
+    </form>
+</div>
+<style>
+    .add-product-container {
+        max-width: 500px;
+        margin: 2em auto;
+        padding: 2em;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .add-product-container h2 {
+        margin-bottom: 1em;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 1em;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5em;
+    }
+    .form-control, .form-control-file {
+        width: 100%;
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 0.75em;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background: #555;
+    }
+    .alert {
+        margin-bottom: 1em;
+    }
+</style>
+{% endblock %}
