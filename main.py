@@ -479,10 +479,21 @@ def manage_categories():
 
     return render_template('categories.html', form=form, categories=categories)
 
+
 @app.route("/product_categories")
 def product_categories():
     categories = Category.query.all()
-    return render_template("product_categories.html", user=current_user, categories=categories)
+    role_based_template = 'user_base.html'
+
+    # Determine the correct base template based on the user's role
+    if current_user.role == 'admin':
+        role_based_template = 'admin_base.html'
+    elif current_user.role == 'seller':
+        role_based_template = 'seller_base.html'
+
+    return render_template("product_categories.html", user=current_user, categories=categories,
+                           base_template=role_based_template)
+
 
 @app.route('/products/<category_name>')
 def category_products(category_name):
@@ -509,6 +520,37 @@ def add_to_cart(product_id):
         db.session.commit()
         return jsonify({'message': 'Product added to cart!'})
 
+
+@app.route('/cart')
+@login_required
+def cart():
+    cart_items = Cart.query.filter_by(user_id=current_user.id).all()
+    products = [Product.query.get(item.product_id) for item in cart_items]
+    return render_template('cart.html', cart_items=cart_items, products=products)
+
+@app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
+@login_required
+def remove_from_cart(product_id):
+    print(f"Attempting to remove product with ID: {product_id}")
+    try:
+        cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+        if cart_item:
+            db.session.delete(cart_item)
+            db.session.commit()
+            print("Product removed successfully")
+            return jsonify({'status': 'success', 'message': 'Product removed from cart'})
+        print("Product not found in cart")
+        return jsonify({'status': 'error', 'message': 'Product not found in cart'})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'status': 'error', 'message': 'An error occurred. Please try again.'})
+
+@app.route('/order', methods=['POST'])
+@login_required
+def order():
+    # Implement order logic here
+    flash('Order placed successfully', 'success')
+    return redirect(url_for('cart'))
 
 if __name__ == "__main__":
     app.run(debug=True)

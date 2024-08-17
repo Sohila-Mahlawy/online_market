@@ -1,0 +1,122 @@
+{% extends 'user_base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Your Cart</h2>
+    <div class="cart-container">
+        {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item" data-product-id="{{ item.product.id }}">
+                <div class="cart-item-image">
+                    <img src="{{ url_for('static', filename='uploads/' + item.product.image1) }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="cart-item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p>Color: {{ item.product.color }}</p>
+                    <button class="btn btn-danger remove-from-cart">Remove from Cart</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Your cart is empty.</p>
+        {% endif %}
+        <button id="order-button" class="btn btn-primary">Order</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Remove from Cart functionality
+    $('.remove-from-cart').click(function() {
+        var productId = $(this).closest('.cart-item').data('product-id');
+
+        $.ajax({
+            url: '/remove_from_cart/' + productId,
+            type: 'POST',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+
+    // Order functionality
+    $('#order-button').click(function() {
+        $.ajax({
+            url: '/order',
+            type: 'POST',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert('Order placed successfully');
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert('Failed to place order');
+                }
+            },
+            error: function(xhr) {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+});
+</script>
+
+
+<style>
+    .cart-container {
+        padding: 20px;
+    }
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .cart-item {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .cart-item-image img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: cover;
+        margin-right: 20px;
+    }
+    .cart-item-details {
+        flex: 1;
+    }
+    .cart-item-details h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+{% endblock %}
