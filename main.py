@@ -15,17 +15,18 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from flask_babel import Babel
 from werkzeug.utils import secure_filename
 from models import db, User, bcrypt, Seller, Product, Order, Category, Cart
-from forms import RegistrationForm, LoginForm, ProductForm, CategoryForm
+from forms import RegistrationForm, LoginForm, ProductForm, CategoryForm, OrderForm
 from flask_wtf import CSRFProtect
 
 
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
 babel = Babel(app)
 csrf = CSRFProtect(app)
 csrf.init_app(app)
-
+migrate = Migrate(app, db)
 
 
 # Load the configuration
@@ -543,39 +544,50 @@ def cart():
     return render_template('cart.html', cart_items=cart_items, products=products)
 
 
-@app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
-@login_required
-def remove_from_cart(product_id):
-    try:
-        # Check if the product and user ID are valid
-        if not product_id:
-            raise ValueError('Invalid product ID.')
-
-        cart_item = Cart.query.filter_by(product_id=product_id, user_id=current_user.id).first()
-
-        if not cart_item:
-            app.logger.warning(f'Item with product_id {product_id} not found in cart for user_id {current_user.id}')
-            return jsonify({'status': 'error', 'message': 'Item not found in cart'}), 404
-
-        db.session.delete(cart_item)
-        db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Item removed from cart'})
-
-    except ValueError as e:
-        app.logger.error(f'ValueError: {e}')
-        return jsonify({'status': 'error', 'message': str(e)}), 400
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error(f'Failed to remove item from cart: {e}')
-        return jsonify({'status': 'error', 'message': 'Failed to remove item from cart'}), 500
-
-
-@app.route('/order', methods=['POST'])
+@app.route("/order", methods=['GET', 'POST'])
 @login_required
 def order():
-    # Implement order logic here
-    flash('Order placed successfully', 'success')
-    return redirect(url_for('cart'))
+    cart_items = Cart.query.filter_by(user_id=current_user.id).all()
+    products = [Product.query.get(item.product_id) for item in cart_items]
+
+    form = OrderForm()
+
+    if form.validate_on_submit():
+        email = form.email.data
+        location = form.location.data
+        payment_method = form.payment_method.data
+
+        for item in cart_items:
+            product = Product.query.get(item.product_id)
+            order = Order(
+                user_id=current_user.id,
+                product_id=product.id,
+                seller_id=product.seller_id,  # Assuming this is a field in Product
+                date=datetime.utcnow(),
+                user_email=email,
+                location=location,
+                payment_method=payment_method
+            )
+            db.session.add(order)
+            db.session.commit()
+
+        Cart.query.filter_by(user_id=current_user.id).delete()
+        db.session.commit()
+
+        flash('Order placed successfully!', 'success')
+        return redirect(url_for('dashboard'))  # Redirect to a different page after placing the order
+
+    return render_template('order.html', cart_items=cart_items, products=products, form=form)
+
+@app.route('/remove_from_cart/<int:product_id>', methods=['DELETE'])
+@login_required
+def remove_from_cart(product_id):
+    cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if cart_item:
+        db.session.delete(cart_item)
+        db.session.commit()
+        return jsonify({'message': 'Item removed from cart'}), 200
+    return jsonify({'message': 'Item not found'}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)

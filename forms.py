@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, SubmitField, IntegerField, PasswordField, SelectField, FileField
+from wtforms import StringField, DecimalField, SubmitField, IntegerField, PasswordField, SelectField, FileField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
 from flask_wtf.file import FileAllowed
 from models import User, Category, Seller, Product
@@ -50,3 +50,12 @@ class CategoryForm(FlaskForm):
     price = IntegerField(validators=[DataRequired()])
     submit = SubmitField('Create/Update Category')
 
+class OrderForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    location = StringField('Location', validators=[DataRequired()])
+    payment_method = SelectField(
+        'Payment Method',
+        choices=[('cash', 'Cash'), ('visa', 'Visa')],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Place Order')

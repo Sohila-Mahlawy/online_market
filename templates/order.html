@@ -1,0 +1,48 @@
+{% extends 'user_base.html' %}
+
+{% block title %}Place Your Order{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Review Your Order</h2>
+    <div class="cart-container">
+        {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <div class="cart-item-image">
+                    <img src="{{ url_for('static', filename='uploads/' + item.product.image1) }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="cart-item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p>Color: {{ item.product.color }}</p>
+                    <p>Price: {{ item.product.price }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Your cart is empty.</p>
+        {% endif %}
+        <form method="post" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.location.label(class="form-label") }}
+                {{ form.location(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.payment_method.label(class="form-label") }}
+                {{ form.payment_method(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

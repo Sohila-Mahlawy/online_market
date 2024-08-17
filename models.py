@@ -30,9 +30,11 @@ class Order(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    delivery_time = db.Column(db.DateTime, nullable=False)
+    delivery_time = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(50), nullable=False, default="pending")
     user_email = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(255), nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
 
 class Seller(db.Model):
     id = db.Column(db.Integer, primary_key=True)

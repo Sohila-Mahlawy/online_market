@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container">
+    <div id="message" class="alert" style="display: none;"></div> <!-- Placeholder for messages -->
     <h2>Your Cart</h2>
     <div class="cart-container">
         {% if cart_items %}
@@ -24,62 +25,11 @@
         {% else %}
         <p>Your cart is empty.</p>
         {% endif %}
-<button id="orderButton" class="btn btn-primary">Order</button>
+        <a href="/order"><button id="orderButton" class="btn btn-primary">Order</button></a>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    // Remove from Cart functionality
-    $('.remove-from-cart').on('click', function() {
-        var productId = $(this).closest('.cart-item').data('product-id');
-
-        console.log('Attempting to remove product with ID:', productId);
-
-        $.ajax({
-            url: '/remove_from_cart/' + productId,
-            type: 'POST',
-            success: function(response) {
-                console.log('Response from server:', response);
-                if (response.status === 'success') {
-                    alert(response.message);
-                    location.reload(); // Reload the page to reflect changes
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error status:', status);
-                console.error('Error details:', error);
-                console.error('Response text:', xhr.responseText);
-                alert('An error occurred. Please try again.');
-            }
-        });
-    });
-});
-
-
-    // Order functionality
-    $('#order-button').click(function() {
-        $.ajax({
-            url: '/order',
-            type: 'POST',
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert('Order placed successfully');
-                    location.reload(); // Reload the page to reflect changes
-                } else {
-                    alert('Failed to place order');
-                }
-            },
-            error: function(xhr) {
-                alert('An error occurred. Please try again.');
-            }
-        });
-    });
-});
-</script>
 
 <style>
     .cart-container {
@@ -125,5 +75,49 @@ $(document).ready(function() {
         background-color: #dc3545;
         color: white;
     }
+    #message {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        font-size: 16px;
+        color: white;
+    }
+    #message.success {
+        background-color: #28a745;
+    }
+    #message.error {
+        background-color: #dc3545;
+    }
 </style>
+
+<script>
+$(document).ready(function() {
+    $('.remove-from-cart').click(function() {
+        var productId = $(this).closest('.cart-item').data('product-id');
+        var $cartItem = $(this).closest('.cart-item');
+
+        $.ajax({
+            url: '/remove_from_cart/' + productId,
+            type: 'DELETE',
+            success: function(response) {
+                // Remove the item from the DOM
+                $cartItem.remove();
+
+                // Display a success message
+                $('#message').removeClass('error').addClass('success').text('Item removed from cart successfully.').fadeIn().delay(3000).fadeOut();
+
+                // Optionally update cart total or show a message
+                if ($('.cart-item').length === 0) {
+                    $('.cart-items').append('<p>Your cart is empty.</p>');
+                }
+            },
+            error: function(xhr, status, error) {
+                // Display an error message
+                $('#message').removeClass('success').addClass('error').text('An error occurred while removing the item from the cart.').fadeIn().delay(3000).fadeOut();
+            }
+        });
+    });
+});
+
+</script>
 {% endblock %}
