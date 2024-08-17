@@ -24,7 +24,7 @@
         {% else %}
         <p>Your cart is empty.</p>
         {% endif %}
-        <button id="order-button" class="btn btn-primary">Order</button>
+<button id="orderButton" class="btn btn-primary">Order</button>
     </div>
 </div>
 
@@ -32,25 +32,33 @@
 <script>
 $(document).ready(function() {
     // Remove from Cart functionality
-    $('.remove-from-cart').click(function() {
+    $('.remove-from-cart').on('click', function() {
         var productId = $(this).closest('.cart-item').data('product-id');
+
+        console.log('Attempting to remove product with ID:', productId);
 
         $.ajax({
             url: '/remove_from_cart/' + productId,
             type: 'POST',
             success: function(response) {
+                console.log('Response from server:', response);
                 if (response.status === 'success') {
                     alert(response.message);
                     location.reload(); // Reload the page to reflect changes
                 } else {
-                    alert(response.message);
+                    alert('Error: ' + response.message);
                 }
             },
-            error: function(xhr) {
+            error: function(xhr, status, error) {
+                console.error('Error status:', status);
+                console.error('Error details:', error);
+                console.error('Response text:', xhr.responseText);
                 alert('An error occurred. Please try again.');
             }
         });
     });
+});
+
 
     // Order functionality
     $('#order-button').click(function() {
@@ -72,7 +80,6 @@ $(document).ready(function() {
     });
 });
 </script>
-
 
 <style>
     .cart-container {

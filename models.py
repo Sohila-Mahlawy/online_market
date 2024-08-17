@@ -95,3 +95,5 @@ class Cart(db.Model):
 
     def __repr__(self):
         return f'<Cart {self.user_id} {self.product_id}>'
+
+

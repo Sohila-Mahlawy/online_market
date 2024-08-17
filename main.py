@@ -542,22 +542,33 @@ def cart():
     products = [Product.query.get(item.product_id) for item in cart_items]
     return render_template('cart.html', cart_items=cart_items, products=products)
 
+
 @app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
 @login_required
 def remove_from_cart(product_id):
-    print(f"Attempting to remove product with ID: {product_id}")
     try:
-        cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-        if cart_item:
-            db.session.delete(cart_item)
-            db.session.commit()
-            print("Product removed successfully")
-            return jsonify({'status': 'success', 'message': 'Product removed from cart'})
-        print("Product not found in cart")
-        return jsonify({'status': 'error', 'message': 'Product not found in cart'})
+        # Check if the product and user ID are valid
+        if not product_id:
+            raise ValueError('Invalid product ID.')
+
+        cart_item = Cart.query.filter_by(product_id=product_id, user_id=current_user.id).first()
+
+        if not cart_item:
+            app.logger.warning(f'Item with product_id {product_id} not found in cart for user_id {current_user.id}')
+            return jsonify({'status': 'error', 'message': 'Item not found in cart'}), 404
+
+        db.session.delete(cart_item)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Item removed from cart'})
+
+    except ValueError as e:
+        app.logger.error(f'ValueError: {e}')
+        return jsonify({'status': 'error', 'message': str(e)}), 400
     except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({'status': 'error', 'message': 'An error occurred. Please try again.'})
+        db.session.rollback()
+        app.logger.error(f'Failed to remove item from cart: {e}')
+        return jsonify({'status': 'error', 'message': 'Failed to remove item from cart'}), 500
+
 
 @app.route('/order', methods=['POST'])
 @login_required
