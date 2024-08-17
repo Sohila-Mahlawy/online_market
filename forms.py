@@ -49,3 +49,4 @@ class CategoryForm(FlaskForm):
     name = StringField('Category Name', validators=[DataRequired(), Length(min=2, max=80)])
     price = IntegerField(validators=[DataRequired()])
     submit = SubmitField('Create/Update Category')
+

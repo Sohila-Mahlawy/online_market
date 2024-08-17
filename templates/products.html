@@ -1,59 +1,101 @@
+{% if user.role == "seller" %}
+{% extends 'seller_base.html' %}
+{% endif %}
 {% if user.role == "user" %}
-    {% extends 'user_base.html' %}
-{% elif user.role == "admin" %}
-    {% extends 'admin_base.html' %}
-{% elif user.role == "seller" %}
-    {% extends 'seller_base.html' %}
+{% extends 'user_base.html' %}
+{% endif %}
+{% if user.role == "admin" %}
+{% extends 'admin_base.html' %}
 {% endif %}
 
-{% block title %}{{ category_name }} Products{% endblock %}
-
-{% block content %}
-<div class="container">
-    <h2>{{ category_name }} Products</h2>
-    <div class="product-container">
-        {% for product in products %}
-        <div class="product-card">
-            {% if product.image1 %}
-            <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="{{ product.name }}">
-            {% endif %}
-            <h3>{{ product.name }}</h3>
-            <p>${{ product.price }}</p>
-            <p>Stock: {{ product.stock }}</p>
-            <p>Color: {{ product.color }}</p>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
+{% block head %}
 <style>
     .container {
-        padding: 20px;
+        margin-top: 50px;
     }
-    .product-container {
+    .seller-container {
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
     }
-    .product-card {
+    .seller-card {
         background-color: #f9f9f9;
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        width: 200px;
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .seller-card h3 {
+        margin-top: 0;
+    }
+    .seller-card .info {
+        margin-bottom: 10px;
         text-align: center;
     }
-    .product-card img {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        object-fit: cover;
-        margin-bottom: 10px;
+    .seller-card img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    max-height: 200px; /* Adjust this value as needed to limit the image height */
+}
+    .seller-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
     }
-    .product-card h3 {
-        margin-top: 0;
-        margin-bottom: 10px;
+    .seller-card button:hover {
+        background-color: #555;
+    }
+    .btn-success, .btn-danger {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-success:hover {
+        background-color: #28a745;
+    }
+    .btn-danger:hover {
+        background-color: #dc3545;
+    }
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 5px 10px;
+    }
+    .text-center {
+        text-align: center;
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>My Products</h2>
+    <div class="seller-container">
+        {% for product in products %}
+        <div class="seller-card" id="product-{{ product.id }}">
+            {% if product.image1 %}
+            <img src="{{ url_for('static', filename='uploads/' + product.image1) }}" alt="Product Image">
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            <div class="info">Price: ${{ product.price }}</div>
+            <div class="info">Category: {{ product.category }}</div>
+            <div class="info">Authenticated: {{ product.authenticated }}</div>
+            <a href="/view_details/{{ product.id }}"><button class="btn btn-success btn-sm edit-btn">View Details</button></a>
+        </div>
+        {% else %}
+        <div class="text-center">No products found</div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

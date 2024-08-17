@@ -14,15 +14,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_babel import Babel
 from werkzeug.utils import secure_filename
-from models import db, User, bcrypt, Seller, Product, Order, Category
+from models import db, User, bcrypt, Seller, Product, Order, Category, Cart
 from forms import RegistrationForm, LoginForm, ProductForm, CategoryForm
 from flask_wtf import CSRFProtect
+
 
 
 
 app = Flask(__name__)
 babel = Babel(app)
 csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 
 
@@ -56,6 +58,7 @@ admin.add_view(MyModelView(Product, db.session))
 admin.add_view(MyModelView(Seller, db.session))
 admin.add_view(MyModelView(Order, db.session))
 admin.add_view(MyModelView(Category, db.session))
+admin.add_view(MyModelView(Cart, db.session))
 
 
 
@@ -476,6 +479,10 @@ def manage_categories():
 
     return render_template('categories.html', form=form, categories=categories)
 
+@app.route("/product_categories")
+def product_categories():
+    categories = Category.query.all()
+    return render_template("product_categories.html", user=current_user, categories=categories)
 
 @app.route('/products/<category_name>')
 def category_products(category_name):
@@ -483,6 +490,24 @@ def category_products(category_name):
     return render_template('products.html', products=products, category_name=category_name, user=current_user)
 
 
+from datetime import datetime
+
+
+@app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+@login_required
+@csrf.exempt
+def add_to_cart(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    # Check if product is already in the cart
+    existing_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if existing_item:
+        return jsonify({'message': 'Product is already in your cart.'})
+    else:
+        new_cart_item = Cart(user_id=current_user.id, product_id=product_id, date_added=datetime.utcnow())
+        db.session.add(new_cart_item)
+        db.session.commit()
+        return jsonify({'message': 'Product added to cart!'})
 
 
 if __name__ == "__main__":
