@@ -466,18 +466,32 @@ def view_details(product_id):
 
 
 @app.route('/categories', methods=['GET', 'POST'])
+@login_required
 def manage_categories():
+    if current_user.role != 'admin':
+        abort(403)  # Only admins can access this route
+
     form = CategoryForm()
     categories = Category.query.all()
 
     if form.validate_on_submit():
-        category = Category(name=form.name.data, price=form.price.data)
-        db.session.add(category)
-        db.session.commit()
-        flash('Category created successfully!', 'success')
-        return redirect(url_for('manage_categories'))
+        category_name = form.name.data
+        category_price = form.price.data
+
+        # Check if a category with the same name already exists
+        existing_category = Category.query.filter_by(name=category_name).first()
+        if existing_category:
+            flash('Category with the same name already exists. Please choose a different name.', 'danger')
+        else:
+            # Create a new Category object
+            new_category = Category(name=category_name, price=category_price)
+            db.session.add(new_category)
+            db.session.commit()
+            flash('Category has been added!', 'success')
+            return redirect(url_for('manage_categories'))
 
     return render_template('categories.html', form=form, categories=categories)
+
 
 
 @app.route("/product_categories")
