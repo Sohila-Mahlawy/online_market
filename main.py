@@ -161,9 +161,12 @@ def dashboard():
     if current_user.role == "admin":
         return render_template("admin_dashboard.html")
     elif current_user.role == "seller":
+
         seller = Seller.query.filter_by(email=current_user.email).first()
         if seller and seller.authenticated:
             orders = Order.query.filter_by(seller_id=current_user.id).order_by(Order.date.desc()).all()
+            for order in orders:
+                print(order.delivery_time)
             return render_template('seller_dashboard.html', orders=orders)
         else:
             return redirect(url_for('pending'))
@@ -634,6 +637,13 @@ def reject_order(order_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route("/deliery_time/<order_id>")
+@login_required
+def delivery_time(order_id):
+    order=Order.query.filter_by(order_id=order_id).first
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

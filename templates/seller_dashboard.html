@@ -1,16 +1,93 @@
-{% extends "seller_base.html" %}
+{% extends 'seller_base.html' %}
+
+{% block head %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+    .seller-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .seller-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .seller-card h3 {
+        margin-top: 0;
+    }
+    .seller-card .info {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .seller-card img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    max-height: 200px; /* Adjust this value as needed to limit the image height */
+}
+    .seller-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .seller-card button:hover {
+        background-color: #555;
+    }
+    .btn-success, .btn-danger {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-success:hover {
+        background-color: #28a745;
+    }
+    .btn-danger:hover {
+        background-color: #dc3545;
+    }
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 5px 10px;
+    }
+    .text-center {
+        text-align: center;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Newest Orders</h2>
-    <div class="orders-container">
+    <h2>My Orders</h2>
+    <div class="seller-container">
         {% for order in orders %}
-        <div class="order-box">
-            <p>User Email: {{ order.user_email }}</p>
-            <p>Product: {{ order.product.name }}</p>
-            <p>Delivery Time: {{ order.delivery_time }}</p>
-            <p>Status: {{ order.status }}</p>
+        <div class="seller-card" >
+
+            <div class="info">User Email: {{ order.user_email }}</div>
+            <div class="info">Product: {{ order.product.name }}</div>
+            {% if order.delivery_time%}
+            <div class="info">Delivery Time: {{ order.delivery_time }}</div>
+
+            {% else %}
+            <a href="/delivery_time/{{ order.id }}"><button class="btn btn-success btn-sm edit-btn">Add Delivery Time</button></a>
+            {% endif %}
         </div>
+        {% else %}
+        <div class="text-center">No orders found</div>
         {% endfor %}
     </div>
 </div>
