@@ -1,0 +1,105 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Order Assignments{% endblock %}
+
+{% block head %}
+<style>
+    .order-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .order-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .order-card h3 {
+        margin-top: 0;
+    }
+    .order-card .info {
+        margin-bottom: 10px;
+    }
+    .order-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .order-card button:hover {
+        background-color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Order Assignments</h1>
+    <div class="order-container">
+        {% for order in orders %}
+        <div class="order-card" id="order-{{ order.id }}">
+            <h3>Order #{{ order.id }}</h3>
+            <div class="info">Seller Email: {{ sellers[order.seller_id].email }}</div>
+            <div class="info">User Email: {{ users[order.user_id].email }}</div>
+            <div class="info">Product Name: {{ order.product.name }}</div>
+
+            <button class="approve-btn" data-id="{{ order.id }}">Approve</button>
+            <button class="reject-btn" data-id="{{ order.id }}">Reject</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $(".approve-btn").click(function() {
+        var orderId = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: "/approve_order/" + orderId,
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#order-" + orderId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error details:", textStatus, errorThrown);
+                alert("An error occurred while approving the order.");
+            }
+        });
+    });
+
+    $(".reject-btn").click(function() {
+        var orderId = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            url: "/reject_order/" + orderId,
+            success: function(response) {
+                if (response.status === "success") {
+                    $("#order-" + orderId).remove();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error details:", textStatus, errorThrown);
+                alert("An error occurred while rejecting the order.");
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

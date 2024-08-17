@@ -589,5 +589,51 @@ def remove_from_cart(product_id):
         return jsonify({'message': 'Item removed from cart'}), 200
     return jsonify({'message': 'Item not found'}), 404
 
+
+@app.route("/order_assignments")
+@login_required
+def order_assignments():
+    if current_user.role != "admin":
+        return redirect(url_for("dashboard"))
+
+    orders = Order.query.filter_by(status="pending").all()
+    sellers = {order.seller_id: Seller.query.get_or_404(order.seller_id) for order in orders}
+    users = {order.user_id: User.query.get_or_404(order.user_id) for order in orders}
+
+    return render_template("order_assignments.html", orders=orders, sellers=sellers, users=users)
+
+
+@app.route('/approve_order/<int:order_id>', methods=['POST'])
+@login_required
+def approve_order(order_id):
+    if current_user.role != 'admin':
+        return jsonify({'status': 'error', 'message': 'Unauthorized access.'}), 403
+
+    order = Order.query.get_or_404(order_id)
+    if order.status == 'approved':
+        return jsonify({'status': 'error', 'message': 'Order already approved.'})
+
+    order.status = 'approved'
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Order approved successfully.'})
+
+@app.route('/reject_order/<int:order_id>', methods=['POST'])
+@login_required
+def reject_order(order_id):
+    if current_user.role != 'admin':
+        return jsonify({'status': 'error', 'message': 'Unauthorized access.'}), 403
+
+    order = Order.query.get_or_404(order_id)
+    if order.status == 'rejected':  # Check if the order is already rejected
+        return jsonify({'status': 'error', 'message': 'Order already rejected.'})
+
+    try:
+        db.session.delete(order)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Order rejected and removed successfully.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
