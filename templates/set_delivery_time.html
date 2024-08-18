@@ -1,0 +1,90 @@
+{% extends 'seller_base.html' %}
+
+{% block title %}Set Delivery Time{% endblock %}
+
+{% block head %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .form-group button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .form-group button:hover {
+        background-color: #555;
+    }
+    #error-message {
+        color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Set Delivery Time for Order #{{ order.id }}</h2>
+    <div class="form-container">
+        <form id="delivery-time-form" action="/delivery_time/{{ order.id }}" method="POST">
+            <div class="form-group">
+                <label for="delivery_time">Delivery Time:</label>
+                <input type="text" id="delivery_time" name="delivery_time" placeholder="YYYY-MM-DD HH:MM:SS" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Save Delivery Time</button>
+            </div>
+            <div id="error-message"></div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#delivery-time-form').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var formData = $(this).serialize();
+        var url = $(this).attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            success: function(response) {
+                if (response.status === 'success') {
+                    window.location.href = '/dashboard'; // Redirect to dashboard on success
+                } else {
+                    $('#error-message').text(response.message);
+                }
+            },
+            error: function() {
+                $('#error-message').text('An error occurred while setting the delivery time.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

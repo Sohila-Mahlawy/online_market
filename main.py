@@ -638,10 +638,26 @@ def reject_order(order_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@app.route("/deliery_time/<order_id>")
+@app.route('/delivery_time/<int:order_id>', methods=['GET', 'POST'])
 @login_required
 def delivery_time(order_id):
-    order=Order.query.filter_by(order_id=order_id).first
+    if current_user.role != 'seller':
+        return redirect(url_for('index'))  # Redirect if the user is not a seller
+
+    order = Order.query.get_or_404(order_id)
+
+    if request.method == 'POST':
+        delivery_time_str = request.form.get('delivery_time')
+        try:
+            delivery_time = datetime.strptime(delivery_time_str, '%Y-%m-%d %H:%M:%S')
+            order.delivery_time = delivery_time
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Delivery time updated successfully.'})
+        except ValueError:
+            return jsonify({'status': 'error', 'message': 'Invalid date format. Use YYYY-MM-DD HH:MM:SS.'}), 400
+
+    return render_template('set_delivery_time.html', order=order)
+
 
 
 
