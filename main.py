@@ -660,6 +660,37 @@ def delivery_time(order_id):
 
 
 
+@app.route('/my_orders')
+@login_required
+def my_orders():
+    # Ensure that the current user is a user or seller
+    if current_user.role != "user":
+        return redirect(url_for('dashboard'))  # Redirect if the user is not authorized
+
+    # Query for orders based on the current user's ID
+    orders = Order.query.filter_by(user_id=current_user.id).all()
+
+    # Categorize orders based on their status and delivery time
+    categorized_orders = {
+        'pending': [],
+        'approved': [],
+        'not_specified': []
+    }
+
+    for order in orders:
+        if order.status == 'pending':
+            categorized_orders['pending'].append(order)
+        elif order.status == 'approved':
+            if order.delivery_time:
+                categorized_orders['approved'].append(order)
+            else:
+                categorized_orders['not_specified'].append(order)
+        else:
+            categorized_orders['not_specified'].append(order)
+
+    return render_template('my_orders.html', categorized_orders=categorized_orders)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

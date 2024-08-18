@@ -1,0 +1,115 @@
+{% extends 'user_base.html' %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block head %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+    .order-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .order-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .order-card h4 {
+        margin-top: 0;
+        font-size: 1.2rem;
+    }
+    .order-card p {
+        margin: 5px 0;
+        text-align: left;
+    }
+    .order-card .details {
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+    .order-card button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .order-card button:hover {
+        background-color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>My Orders</h2>
+
+    <!-- Pending Orders -->
+    <h3>Pending Orders</h3>
+    <div class="order-container">
+        {% for order in categorized_orders['pending'] %}
+        <div class="order-card">
+            <h4>Order #{{ order.id }}</h4>
+            <div class="details">
+                <p><strong>Product:</strong> {{ order.product.name }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+                <p><strong>User Email:</strong> {{ order.user_email }}</p>
+                <p><strong>Location:</strong> {{ order.location }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p>No pending orders.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Approved Orders -->
+    <h3>Approved Orders</h3>
+    <div class="order-container">
+        {% for order in categorized_orders['approved'] %}
+        <div class="order-card">
+            <h4>Order #{{ order.id }}</h4>
+            <div class="details">
+                <p><strong>Product:</strong> {{ order.product.name }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+                <p><strong>Delivery Time:</strong> {{ order.delivery_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>User Email:</strong> {{ order.user_email }}</p>
+                <p><strong>Location:</strong> {{ order.location }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p>No approved orders with specified delivery time.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Orders with unspecified delivery time -->
+    <h3>Orders with Unspecified Delivery Time</h3>
+    <div class="order-container">
+        {% for order in categorized_orders['not_specified'] %}
+        <div class="order-card">
+            <h4>Order #{{ order.id }}</h4>
+            <div class="details">
+                <p><strong>Product:</strong> {{ order.product.name }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+                <p><strong>User Email:</strong> {{ order.user_email }}</p>
+                <p><strong>Location:</strong> {{ order.location }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            </div>
+        </div>
+        {% else %}
+        <p>No orders with unspecified delivery time.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

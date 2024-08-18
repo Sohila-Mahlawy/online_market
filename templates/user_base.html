@@ -245,6 +245,8 @@
                     <li><a href="/product_categories">Products</a></li>
                     {% if current_user.is_authenticated %}
                     <li><a href="/cart">Cart</a></li>
+                    <li><a href="/my_orders">My Orders</a></li>
+
                     {% endif %}
                     <li>
                         <form action="/search" method="get" class="search-form">
